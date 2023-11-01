@@ -25,7 +25,7 @@ module.exports = {
       });
 
       await user.save();
-      console.log(user.id);
+
       return jsonwebtoken.sign(
         {
           id: user.id,
