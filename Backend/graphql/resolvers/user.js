@@ -6,8 +6,15 @@ require("dotenv").config();
 
 module.exports = {
   Query: {
-    hello: () => "GraphQl is Awesome",
-    welcome: (parent, args) => `Hello ${args.name}`,
+    hello: () => "hi",
+    users: async (root, args, { user }) => {
+      if (!user) throw new Error("You are not authenticated!");
+      return await User.find();
+    },
+    user: async (root, args, { user }) => {
+      if (!user) throw new Error("You are not authenticated!");
+      return await User.findOne({ _id: user.id });
+    },
   },
   Mutation: {
     signUp: async (root, args, context, info) => {

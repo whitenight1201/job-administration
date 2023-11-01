@@ -1,5 +1,6 @@
 const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
+const jwt = require("jsonwebtoken");
 
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
@@ -14,7 +15,19 @@ const resolvers = require("./graphql/resolvers/resolver");
 
 // Use the Express application as middleware in Apollo server
 async function startServer() {
-  const server = new ApolloServer({ typeDefs, resolvers });
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: ({ req }) => {
+      const token = req.header("Authorization");
+      if (token) {
+        return {
+          user: jwt.verify(token, process.env.JWT_SECRET),
+        };
+      }
+      return null;
+    },
+  });
   await server.start();
   await connectDB();
 
