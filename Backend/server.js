@@ -1,18 +1,30 @@
 const express = require("express");
+const { ApolloServer } = require("apollo-server-express");
 
 if (process.env.NODE_ENV !== "production") {
   require("dotenv").config();
 }
 
-const connectDB = require("./config/db");
-
 const app = express();
 
-app.get("/", (req, res) => res.send("API Running"));
-
-// Connect Database
+const connectDB = require("./config/db");
 connectDB();
 
-const PORT = process.env.PORT || 5000;
+const typeDefs = require("./graphql/typeDefs");
+const resolvers = require("./graphql/resolvers");
 
-app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+// Use the Express application as middleware in Apollo server
+const startServer = async () => {
+  const server = new ApolloServer({ typeDefs, resolvers });
+  await server.start();
+  
+  server.applyMiddleware({ app });
+  
+  app.get("/", (req, res) => res.send("API Running"));
+
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+};
+
+startServer();
+
