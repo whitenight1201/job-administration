@@ -3,13 +3,13 @@ const mongoURI = process.env.MONGODB_URI;
 
 const connectDB = async () => {
   try {
-    await mongoose.connect(mongoURI, {
+    mongoose.connect(mongoURI, {
       useNewUrlParser: true,
     });
 
-    console.log("MongoDB Connected...");
+    console.log("MongoDB Connected... 👌");
   } catch (err) {
-    console.error(err.message);
+    console.error('😕', err.message);
     // Exit process with failure
     process.exit(1);
   }
