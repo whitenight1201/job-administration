@@ -14,9 +14,8 @@ module.exports = {
       const { email, name, password } = args;
       let user = await User.findOne({ email });
 
-      if (user) {
+      if (user)
         throw new ApolloError("User already exist.", "USER_ALREADY_EXIST");
-      }
 
       user = new User({
         email,
@@ -25,6 +24,25 @@ module.exports = {
       });
 
       await user.save();
+
+      return jsonwebtoken.sign(
+        {
+          id: user.id,
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "7 days" }
+      );
+    },
+    signIn: async (root, args, context, info) => {
+      const { email, password } = args;
+      const user = await User.findOne({ email });
+
+      if (!user)
+        throw new ApolloError("No user with that email", "USER_NOT_EXIST");
+
+      const valid = await bcrypt.compare(password, user.password);
+      if (!valid)
+        throw new ApolloError("Incorrect password", "PASSWORD_INCORRECT");
 
       return jsonwebtoken.sign(
         {

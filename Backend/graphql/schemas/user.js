@@ -12,5 +12,9 @@ module.exports = gql`
       name: String!
       password: String!
     ): String
+    signIn(
+      email: String!
+      password: String!
+    ): String
   }
 `;
