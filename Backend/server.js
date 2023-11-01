@@ -9,8 +9,8 @@ const app = express();
 
 const connectDB = require("./config/db");
 
-const typeDefs = require("./graphql/typeDefs");
-const resolvers = require("./graphql/resolvers");
+const typeDefs = require("./graphql/schemas/schemas");
+const resolvers = require("./graphql/resolvers/resolver");
 
 // Use the Express application as middleware in Apollo server
 async function startServer() {

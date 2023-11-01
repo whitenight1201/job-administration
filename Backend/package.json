@@ -16,15 +16,17 @@
     "url": "https://github.com/whitenight1201/job-administration/issues"
   },
   "homepage": "https://github.com/whitenight1201/job-administration#readme",
-  "description": "",
   "dependencies": {
     "apollo-server-express": "^3.12.1",
+    "bcrypt": "^5.1.1",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "graphql": "^16.8.1",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^7.6.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
-  }
+  },
+  "description": ""
 }
