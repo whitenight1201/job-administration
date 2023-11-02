@@ -21,8 +21,7 @@ module.exports = {
       const { email, name, password } = args;
       let user = await User.findOne({ email });
 
-      if (user)
-        throw new ApolloError("User already exist.", "USER_ALREADY_EXIST");
+      if (user) throw new AuthenticationError("User already exist");
 
       user = new User({
         email,
@@ -46,16 +45,15 @@ module.exports = {
       const { email, password, role } = args;
       const user = await User.findOne({ email });
 
-      if (!user)
-        throw new ApolloError("No user with that email", "USER_NOT_EXIST");
+      if (!user) throw new AuthenticationError("No user with that email");
 
-      if (!user.role.includes("isadmin"))
-        if (user.role !== role)
-          throw new AuthenticationError("Nice try,You can't access that role. 😕");
+      if (!user.role.includes("isadmin") && user.role !== role)
+        throw new AuthenticationError(
+          "Nice try,You can't access that role. 😕"
+        );
 
       const valid = await bcrypt.compare(password, user.password);
-      if (!valid)
-        throw new ApolloError("Incorrect password", "PASSWORD_INCORRECT");
+      if (!valid) throw new AuthenticationError("Incorrect password");
 
       return jsonwebtoken.sign(
         {
@@ -65,6 +63,73 @@ module.exports = {
         process.env.JWT_SECRET,
         { expiresIn: "7 days" }
       );
+    },
+    createUser: async (root, args, context, info) => {
+      if (!context.user.role.includes("isadmin"))
+        throw new AuthenticationError(
+          "Nice try,You can't access that role. 😕"
+        );
+
+      const { email, name, password } = args;
+      if (await User.findOne({ email }))
+        throw new AuthenticationError("User already exist.");
+
+      const newuser = new User({
+        email,
+        name,
+        password: await bcrypt.hash(password, 10),
+        role: "isguest",
+      });
+      await newuser.save();
+      return newuser;
+    },
+    updateUserById: async (root, args, context, info) => {
+      const { email, name, password } = args;
+      const updateUser = {
+        email,
+        name,
+        password: await bcrypt.hash(password, 10),
+      };
+
+      const result = await User.findOneAndUpdate(
+        { _id: context.user.id },
+        { $set: updateUser },
+        { new: true }
+      );
+      return result;
+    },
+    updateUser: async (root, args, context, info) => {
+      if (!context.user.role.includes("isadmin"))
+        throw new AuthenticationError(
+          "Nice try,You can't access that role. 😕"
+        );
+
+      const { id, email, name, password } = args;
+      const updateUser = {
+        email,
+        name,
+        password: await bcrypt.hash(password, 10),
+      };
+
+      const result = await User.findOneAndUpdate(
+        { _id: id },
+        { $set: updateUser },
+        { new: true }
+      );
+      return result;
+    },
+    deleteUser: async (root, args, context, info) => {
+      if (!context.user.role.includes("isadmin"))
+        throw new AuthenticationError(
+          "Nice try,You can't access that role. 😕"
+        );
+
+      const { id } = args;
+      const deletedUser = await User.findByIdAndDelete(id);
+      if (!deletedUser) {
+        throw new Error(`User with ID ${id} not found`);
+      }
+      return deletedUser;
     },
   },
 };
