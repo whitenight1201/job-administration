@@ -1,4 +1,4 @@
-const { ApolloError } = require("apollo-server-express");
+const { ApolloError, AuthenticationError } = require("apollo-server-express");
 const { User } = require("../../models");
 const bcrypt = require("bcrypt");
 const jsonwebtoken = require("jsonwebtoken");
@@ -28,6 +28,7 @@ module.exports = {
         email,
         name,
         password: await bcrypt.hash(password, 10),
+        role: "isguest",
       });
 
       await user.save();
@@ -35,17 +36,22 @@ module.exports = {
       return jsonwebtoken.sign(
         {
           id: user.id,
+          role: user.role,
         },
         process.env.JWT_SECRET,
         { expiresIn: "7 days" }
       );
     },
     signIn: async (root, args, context, info) => {
-      const { email, password } = args;
+      const { email, password, role } = args;
       const user = await User.findOne({ email });
 
       if (!user)
         throw new ApolloError("No user with that email", "USER_NOT_EXIST");
+
+      if (!user.role.includes("isadmin"))
+        if (user.role !== role)
+          throw new AuthenticationError("Nice try,You can't access that role. 😕");
 
       const valid = await bcrypt.compare(password, user.password);
       if (!valid)
@@ -54,6 +60,7 @@ module.exports = {
       return jsonwebtoken.sign(
         {
           id: user.id,
+          role: user.role,
         },
         process.env.JWT_SECRET,
         { expiresIn: "7 days" }
