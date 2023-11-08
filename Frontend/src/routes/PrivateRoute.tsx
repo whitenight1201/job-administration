@@ -11,8 +11,7 @@ const PrivateRoute: React.FC<PropsWithChildren<IProps>> = (props) => {
   const { children, layout: Layout } = props;
   const { pathname } = useLocation();
 
-  // TODO: validate auth
-  const isLoggedIn: boolean = true;
+  const isLoggedIn = !!localStorage.getItem("token");
 
   return isLoggedIn ? (
     <Layout>{children}</Layout>
