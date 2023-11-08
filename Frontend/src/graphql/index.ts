@@ -9,3 +9,21 @@ export const LOGIN = `
     signIn(email: $email, password: $password, role: $role)
   }
   `;
+
+export const GET_USERS = `
+  query Users {
+    users {
+      email
+      id
+      name
+    }
+  }
+  `;
+
+export const DELETE_USER = `
+  mutation DeleteUser($id: String) {
+    deleteUser(id: $id) {
+      id
+    }
+  }
+  `;
