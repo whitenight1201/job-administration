@@ -3,7 +3,7 @@ import Table from "../../components/Tables/Table";
 
 const PageHome: React.FC = () => {
   return (
-    <div className="flex w-full h-full items-center justify-center">
+    <div className="w-full h-full mx-auto max-w-screen-2xl p-4 md:p-6 2xl:p-10">
       <Table />
     </div>
   );

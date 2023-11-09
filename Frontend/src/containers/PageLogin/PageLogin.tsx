@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
@@ -111,6 +111,12 @@ const PageLogin: React.FC = () => {
                 Login as Guest
               </button>
             </div>
+            <span className="block text-center text-neutral-800 pt-10">
+              New user? {` `}
+              <Link className="text-green-600" to="/signup">
+                Create an account
+              </Link>
+            </span>
           </Form>
         </Formik>
       </div>
